@@ -83,5 +83,100 @@ namespace Models.Test
             Assert.Throws<InputLayerException>(() => layer.SetInput(new int[] { }));
         }
 
+        [Fact]
+        public void GetInput_PassInputArray_GetTheSameArray()
+        {
+            // Arrange
+            InputLayer layer = new(5);
+
+            // Act
+            layer.SetInput(new int[] { 1, 0, 1, 1, 0 });
+            int[] input = layer.GetInput();
+
+            // Assert
+            Assert.Equal(5, input.Length);
+            Assert.Equal(1, input[0]);
+            Assert.Equal(0, input[1]);
+            Assert.Equal(1, input[2]);
+            Assert.Equal(1, input[3]);
+            Assert.Equal(0, input[4]);
+        }
+
+        [Fact]
+        public void AddBias_GetTrueFromHasBiasMethod()
+        {
+            // Arrange
+            InputLayer layer1 = new(5);
+            InputLayer layer2 = new(5);
+
+            // Act
+            layer1.AddBias();
+            layer2.AddBias();
+
+            // Assert
+            Assert.True(layer1.HasBias());
+            Assert.True(layer2.HasBias());
+        }
+
+        [Fact]
+        public void RemoveBias_GetFalseFromHasBiasMethod()
+        {
+            // Arrange
+            InputLayer layer1 = new(5);
+            InputLayer layer2 = new(5);
+
+            // Act
+            layer1.RemoveBias();
+            layer2.AddBias();
+            layer2.RemoveBias();
+
+            // Assert
+            Assert.False(layer1.HasBias());
+            Assert.False(layer2.HasBias());
+        }
+
+        [Fact]
+        public void HasBias_DefaultValue_GetFalse()
+        {
+            // Arrange
+            InputLayer layer = new(5);
+
+            // Act
+            bool hasBias = layer.HasBias();
+
+            // Arrange
+            Assert.False(hasBias);
+
+        }
+
+        [Fact]
+        public void HasBias_AddBias_GetTrue()
+        {
+            // Arrange
+            InputLayer layer = new(5);
+
+            // Act
+            layer.AddBias();
+            bool hasBias = layer.HasBias();
+
+            // Arrange
+            Assert.True(hasBias);
+        }
+
+        [Fact]
+        public void HasBias_RemoveBias_GetFalse()
+        {
+            // Arrange
+            InputLayer layer = new(5);
+
+            // Act
+            layer.AddBias();
+            layer.RemoveBias();
+            bool hasBias = layer.HasBias();
+
+            // Arrange
+            Assert.False(hasBias);
+        }
+
     }
 }
