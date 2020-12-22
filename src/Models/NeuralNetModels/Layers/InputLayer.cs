@@ -1,9 +1,8 @@
 ﻿using Models.NeuralNetModels.Exceptions;
-using System;
 
 namespace Models.NeuralNetModels.Layers
 {
-    public class InputLayer
+    public class InputLayer : ILayer
     {
 
         private int[] _items;

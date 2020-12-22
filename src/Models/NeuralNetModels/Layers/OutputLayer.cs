@@ -1,15 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Models.NeuralNetModels.Exceptions;
 
 namespace Models.NeuralNetModels.Layers
 {
-    class OutputLayer
+    public class OutputLayer : ILayer
     {
 
+        private float[] _items;
 
+        public OutputLayer(int numberOfItems)
+        {
+            _items = new float[numberOfItems];
+        }
+
+        public void SetOutput(float[] outputs)
+        {
+            if (!IsValidOutput(outputs))
+            {
+                throw new OutputLayerException();
+            }
+            _items = outputs;
+        }
+
+        public float[] GetOutput()
+        {
+            return _items;
+        }
+
+        private bool IsValidOutput(float[] outputs)
+        {
+            return outputs.Length == _items.Length;
+        }
 
     }
 }
