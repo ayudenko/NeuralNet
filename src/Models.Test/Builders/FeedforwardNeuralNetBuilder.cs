@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 
-namespace Models.NeuralNetModels.Layers
+namespace Models.Test.Builders
 {
-    interface ILayer
+    class FeedforwardNeuralNetBuilder
     {
+
+
     }
 }
