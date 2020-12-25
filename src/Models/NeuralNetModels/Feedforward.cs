@@ -10,9 +10,13 @@ namespace Models.NeuralNetModels
 
         public Feedforward(int inputsNumber, int outputsNumber)
         {
-            if (!IsValidInputsNumber(inputsNumber) || !IsValidOutputsNumber(outputsNumber))
+            if (!IsValidInputsNumber(inputsNumber))
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("Incorrent number of input items.");
+            }
+            if (!IsValidOutputsNumber(outputsNumber))
+            {
+                throw new ArgumentOutOfRangeException("Incorrent number of output items.");
             }
             _inputs = new float[inputsNumber];
             _outputs = new float[outputsNumber];
@@ -20,7 +24,21 @@ namespace Models.NeuralNetModels
 
         public void SetInputs(float[] inputs)
         {
+            if (!IsValidInputs(inputs))
+            {
+                throw new ArgumentException("Wrong number of input values.");
+            }
             _inputs = inputs;
+        }
+
+        public float[] GetOutputs()
+        {
+            return _outputs;
+        }
+
+        private bool IsValidInputs(float[] inputs)
+        {
+            return inputs.Length == _inputs.Length;
         }
 
         private static bool IsValidInputsNumber(int inputsNumber)

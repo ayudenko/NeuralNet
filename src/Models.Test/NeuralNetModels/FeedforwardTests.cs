@@ -23,5 +23,20 @@ namespace Models.Test.NeuralNetModels
             Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(2, -1));
         }
 
+        [Fact]
+        public void SetInputs_PassArrayOfDifferentDimension_GetException()
+        {
+            // Arrange
+            Feedforward network = new(3, 1);
+
+            // Act
+            float[] inputs1 = { 1.1f, 1.2f };
+            float[] inputs2 = { 1.1f, 1.2f, 1.3f, 1.4f };
+
+            // Assert
+            Assert.Throws<ArgumentException>(() => network.SetInputs(inputs1));
+            Assert.Throws<ArgumentException>(() => network.SetInputs(inputs2));
+        }
+
     }
 }
