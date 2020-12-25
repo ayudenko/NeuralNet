@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models.NeuralNetModels.ActivationFunctions;
+using System;
 
 namespace Models.NeuralNetModels
 {
@@ -7,6 +8,9 @@ namespace Models.NeuralNetModels
 
         private float[] _inputs;
         private float[] _outputs;
+        private float[,] _weights;
+
+        public IActivationFunction ActivationFunction { get; set; }
 
         public Feedforward(int inputsNumber, int outputsNumber)
         {
@@ -20,6 +24,8 @@ namespace Models.NeuralNetModels
             }
             _inputs = new float[inputsNumber];
             _outputs = new float[outputsNumber];
+            _weights = new float[outputsNumber, inputsNumber];
+            RandomizeWeights();
         }
 
         public void SetInputs(float[] inputs)
@@ -34,6 +40,18 @@ namespace Models.NeuralNetModels
         public float[] GetOutputs()
         {
             return _outputs;
+        }
+
+        private void RandomizeWeights()
+        {
+            for (int i = 0; i < _weights.GetLength(0); i++)
+            {
+                for (int k = 0; k < _weights.GetLength(1); k++)
+                {
+                    var rand = new Random();
+                    _weights[i, k] = (float)rand.NextDouble();
+                }
+            }
         }
 
         private bool IsValidInputs(float[] inputs)
