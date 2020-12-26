@@ -6,24 +6,24 @@ namespace Math
     public class Matrix
     {
 
-        private readonly Single[,] _matrix;
+        private readonly float[,] _matrix;
 
-        public Matrix(Single[,] matrix)
+        public Matrix(float[,] matrix)
         {
             _matrix = matrix;
         }
 
-        public Single GetItem(Int32 x, Int32 y)
+        public float GetItem(int row, int column)
         {
-            return _matrix[x, y];
+            return _matrix[row, column];
         }
 
-        public Int32 GetDimension0()
+        public int GetDimension0()
         {
             return _matrix.GetLength(0);
         }
 
-        public Int32 GetDimension1()
+        public int GetDimension1()
         {
             return _matrix.GetLength(1);
         }
@@ -34,10 +34,10 @@ namespace Math
             {
                 throw new IncorrectDimensionException();
             }
-            Single[,] newMatrix = new Single[GetDimension0(), GetDimension1()];
-            for (Int32 i = 0; i < GetDimension0(); i++)
+            float[,] newMatrix = new float[GetDimension0(), GetDimension1()];
+            for (int i = 0; i < GetDimension0(); i++)
             {
-                for (Int32 k = 0; k < GetDimension1(); k++)
+                for (int k = 0; k < GetDimension1(); k++)
                 {
                     newMatrix[i, k] = GetItem(i, k) + matrix.GetItem(i, k);
                 }
@@ -46,12 +46,12 @@ namespace Math
             return result;
         }
 
-        public Matrix Multiply(Single scalar)
+        public Matrix Multiply(float scalar)
         {
-            Single[,] newMatrix = new Single[GetDimension0(), GetDimension1()];
-            for (Int32 i = 0; i < GetDimension0(); i++)
+            float[,] newMatrix = new float[GetDimension0(), GetDimension1()];
+            for (int i = 0; i < GetDimension0(); i++)
             {
-                for (Int32 k = 0; k < GetDimension1(); k++)
+                for (int k = 0; k < GetDimension1(); k++)
                 {
                     newMatrix[i, k] = GetItem(i, k) * scalar;
                 }
@@ -62,12 +62,12 @@ namespace Math
 
         public Matrix Multiply(Matrix matrix)
         {
-            Single[,] newMatrix = new Single[GetDimension0(), matrix.GetDimension1()];
+            float[,] newMatrix = new float[GetDimension0(), matrix.GetDimension1()];
             for (int i = 0; i < GetDimension0(); i++)
             {
                 for (int k = 0; k < matrix.GetDimension1(); k++)
                 {
-                    for (Int32 m = 0; m < GetDimension1(); m++)
+                    for (int m = 0; m < GetDimension1(); m++)
                     {
                         newMatrix[i, k] += GetItem(i, m) * matrix.GetItem(m, k);
                     }
