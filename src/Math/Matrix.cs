@@ -77,5 +77,18 @@ namespace Math
             return result;
         }
 
+        public Matrix Transpose()
+        {
+            float[,] newMatrix = new float[GetDimension1(), GetDimension0()];
+            for (int i = 0; i < GetDimension0(); i++)
+            {
+                for (int k = 0; k < GetDimension1(); k++)
+                {
+                    newMatrix[k, i] = _matrix[i, k];
+                }
+            }
+            Matrix result = new(newMatrix);
+            return result;
+        }
     }
 }

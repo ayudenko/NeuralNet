@@ -162,5 +162,51 @@ namespace Math.Test
             Assert.Equal(8f, result2.GetItem(1, 0));
         }
 
+        [Fact]
+        public void Transpose_GetTransposedMatrix_WhenMatrixIsPassed()
+        {
+            float[,] matrixItems1 = new float[,] { { 1, 2, 3 }, { 4, 5, 6 } };
+            float[,] matrixItems2 = new float[,] { { 1, 2 }, { 3, 4 } };
+            float[,] matrixItems3 = new float[,] { { 1, 2, 3 } };
+            float[,] matrixItems4 = new float[,] { { 1 }, { 2 }, { 3 } };
+
+            Matrix matrix1 = new(matrixItems1);
+            Matrix matrix2 = new(matrixItems2);
+            Matrix matrix3 = new(matrixItems3);
+            Matrix matrix4 = new(matrixItems4);
+
+            Matrix transposedMatrix1 = matrix1.Transpose();
+            Matrix transposedMatrix2 = matrix2.Transpose();
+            Matrix transposedMatrix3 = matrix3.Transpose();
+            Matrix transposedMatrix4 = matrix4.Transpose();
+
+            Assert.Equal(3, transposedMatrix1.GetDimension0());
+            Assert.Equal(2, transposedMatrix1.GetDimension1());
+            Assert.Equal(1, transposedMatrix1.GetItem(0, 0));
+            Assert.Equal(4, transposedMatrix1.GetItem(0, 1));
+            Assert.Equal(2, transposedMatrix1.GetItem(1, 0));
+            Assert.Equal(5, transposedMatrix1.GetItem(1, 1));
+            Assert.Equal(3, transposedMatrix1.GetItem(2, 0));
+            Assert.Equal(6, transposedMatrix1.GetItem(2, 1));
+
+            Assert.Equal(2, transposedMatrix2.GetDimension0());
+            Assert.Equal(2, transposedMatrix2.GetDimension1());
+            Assert.Equal(1, transposedMatrix2.GetItem(0, 0));
+            Assert.Equal(3, transposedMatrix2.GetItem(0, 1));
+            Assert.Equal(2, transposedMatrix2.GetItem(1, 0));
+            Assert.Equal(4, transposedMatrix2.GetItem(1, 1));
+
+            Assert.Equal(3, transposedMatrix3.GetDimension0());
+            Assert.Equal(1, transposedMatrix3.GetDimension1());
+            Assert.Equal(1, transposedMatrix3.GetItem(0, 0));
+            Assert.Equal(2, transposedMatrix3.GetItem(1, 0));
+            Assert.Equal(3, transposedMatrix3.GetItem(2, 0));
+
+            Assert.Equal(1, transposedMatrix4.GetDimension0());
+            Assert.Equal(3, transposedMatrix4.GetDimension1());
+            Assert.Equal(1, transposedMatrix4.GetItem(0, 0));
+            Assert.Equal(2, transposedMatrix4.GetItem(0, 1));
+            Assert.Equal(3, transposedMatrix4.GetItem(0, 2));
+        }
     }
 }
