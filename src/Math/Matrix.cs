@@ -7,10 +7,7 @@ namespace Math
 
         private readonly float[,] _matrix;
 
-        public Matrix(float[,] matrix)
-        {
-            _matrix = matrix;
-        }
+        public Matrix(float[,] matrix) => _matrix = matrix;
 
         public Matrix(float[] matrix)
         {
@@ -21,20 +18,11 @@ namespace Math
             }
         }
 
-        public float GetItem(int row, int column)
-        {
-            return _matrix[row, column];
-        }
+        public float GetItem(int row, int column) => _matrix[row, column];
 
-        public int GetDimension0()
-        {
-            return _matrix.GetLength(0);
-        }
+        public int GetDimension0() => _matrix.GetLength(0);
 
-        public int GetDimension1()
-        {
-            return _matrix.GetLength(1);
-        }
+        public int GetDimension1() => _matrix.GetLength(1);
 
         public Matrix Sum(Matrix matrix)
         {

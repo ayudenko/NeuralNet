@@ -1,4 +1,5 @@
-﻿using Models.NeuralNetModels.ActivationFunctions;
+﻿using Math;
+using Models.NeuralNetModels.ActivationFunctions;
 using System;
 
 namespace Models.NeuralNetModels
@@ -28,6 +29,12 @@ namespace Models.NeuralNetModels
             RandomizeWeights();
         }
 
+        public void Process()
+        {
+            Matrix inputMatrix = new(_inputs);
+            Matrix weightsMatrix = new(_weights);
+        }
+
         public void SetInputs(float[] inputs)
         {
             if (!IsValidInputs(inputs))
@@ -37,10 +44,7 @@ namespace Models.NeuralNetModels
             _inputs = inputs;
         }
 
-        public float[] GetOutputs()
-        {
-            return _outputs;
-        }
+        public float[] GetOutputs() => _outputs;
 
         private void RandomizeWeights()
         {
@@ -54,20 +58,11 @@ namespace Models.NeuralNetModels
             }
         }
 
-        private bool IsValidInputs(float[] inputs)
-        {
-            return inputs.Length == _inputs.Length;
-        }
+        private bool IsValidInputs(float[] inputs) => inputs.Length == _inputs.Length;
 
-        private static bool IsValidInputsNumber(int inputsNumber)
-        {
-            return inputsNumber > 0;
-        }
+        private static bool IsValidInputsNumber(int inputsNumber) => inputsNumber > 0;
 
-        private static bool IsValidOutputsNumber(int outputsNumber)
-        {
-            return outputsNumber > 0;
-        }
+        private static bool IsValidOutputsNumber(int outputsNumber) => outputsNumber > 0;
 
     }
 }
