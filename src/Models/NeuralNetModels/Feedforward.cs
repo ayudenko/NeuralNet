@@ -16,11 +16,11 @@ namespace Models.NeuralNetModels
         {
             if (!IsValidInputsNumber(inputsNumber))
             {
-                throw new ArgumentOutOfRangeException("Incorrent number of input items.");
+                throw new ArgumentOutOfRangeException(paramName: nameof(inputsNumber), message: "Incorrent number of input items.");
             }
             if (!IsValidOutputsNumber(outputsNumber))
             {
-                throw new ArgumentOutOfRangeException("Incorrent number of output items.");
+                throw new ArgumentOutOfRangeException(paramName: nameof(outputsNumber), message: "Incorrent number of output items.");
             }
             _inputs = new float[inputsNumber];
             _outputs = new float[outputsNumber];
@@ -32,7 +32,7 @@ namespace Models.NeuralNetModels
         {
             if (!IsValidInputs(inputs))
             {
-                throw new ArgumentException("Wrong number of input values.");
+                throw new ArgumentException(paramName: nameof(inputs), message: "Wrong number of input values.");
             }
             _inputs = inputs;
         }
