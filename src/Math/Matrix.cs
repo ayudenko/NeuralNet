@@ -1,5 +1,4 @@
 ﻿using Math.Exceptions;
-using System;
 
 namespace Math
 {
@@ -11,6 +10,15 @@ namespace Math
         public Matrix(float[,] matrix)
         {
             _matrix = matrix;
+        }
+
+        public Matrix(float[] matrix)
+        {
+            _matrix = new float[1, matrix.Length];
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                _matrix[0, i] = matrix[i];
+            }
         }
 
         public float GetItem(int row, int column)

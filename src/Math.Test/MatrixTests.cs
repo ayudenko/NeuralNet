@@ -6,6 +6,21 @@ namespace Math.Test
 {
     public class MatrixTests
     {
+
+        [Fact]
+        public void Constructor_PassArray()
+        {
+            float[] matrixItems = new float[] { 1, 2, 3 };
+            
+            Matrix matrix = new(matrixItems);
+
+            Assert.Equal(1, matrix.GetDimension0());
+            Assert.Equal(3, matrix.GetDimension1());
+            Assert.Equal(1, matrix.GetItem(0, 0));
+            Assert.Equal(2, matrix.GetItem(0, 1));
+            Assert.Equal(3, matrix.GetItem(0, 2));
+        }
+
         [Theory, InlineData(0, 0, 1),
         InlineData(0, 1, 2),
         InlineData(1, 0, 3),

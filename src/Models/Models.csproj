@@ -8,4 +8,8 @@
     <Folder Include="NeuralNetModels\Exceptions\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Math\Math.csproj" />
+  </ItemGroup>
+
 </Project>
