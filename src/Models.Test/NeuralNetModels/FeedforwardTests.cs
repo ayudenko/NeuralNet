@@ -7,18 +7,20 @@ namespace Models.Test.NeuralNetModels
     public class FeedforwardTests
     {
 
-        [Fact]
-        public void Constructor_PassNumberOfInputsLessThan1_GetException()
+        [Theory]
+        [InlineData(0, 3)]
+        [InlineData(-1, 3)]
+        public void Constructor_PassNumberOfInputsLessThan1_GetException(int inputsNumber, int outputsNumber)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(0, 3));
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(-1, 3));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
         }
 
-        [Fact]
-        public void Constructor_PassNumberOfOutputsLessThan1_GetException()
+        [Theory]
+        [InlineData(2, 0)]
+        [InlineData(2, -1)]
+        public void Constructor_PassNumberOfOutputsLessThan1_GetException(int inputsNumber, int outputsNumber)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(2, 0));
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(2, -1));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
         }
 
         [Fact]
@@ -32,6 +34,8 @@ namespace Models.Test.NeuralNetModels
             Assert.Throws<ArgumentException>(() => network.SetInputs(inputs1));
             Assert.Throws<ArgumentException>(() => network.SetInputs(inputs2));
         }
+
+        
 
     }
 }
