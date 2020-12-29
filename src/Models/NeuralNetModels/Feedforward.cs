@@ -1,5 +1,6 @@
 ﻿using Math;
 using Models.NeuralNetModels.ActivationFunctions;
+using Models.NeuralNetModels.Exceptions;
 using System;
 
 namespace Models.NeuralNetModels
@@ -26,13 +27,39 @@ namespace Models.NeuralNetModels
             _inputs = new float[inputsNumber];
             _outputs = new float[outputsNumber];
             _weights = new float[outputsNumber, inputsNumber];
-            RandomizeWeights();
+        }
+
+        public void InitializeWeightsWithRandomizer()
+        {
+            var rand = new Random();
+            for (int i = 0; i < _weights.GetLength(0); i++)
+            {
+                for (int k = 0; k < _weights.GetLength(1); k++)
+                {
+                    _weights[i, k] = (float)rand.NextDouble();
+                }
+            }
+        }
+
+        public void InitializeWeightsWithSingle(float value)
+        {
+            for (int i = 0; i < _weights.GetLength(0); i++)
+            {
+                for (int k = 0; k < _weights.GetLength(1); k++)
+                {
+                    _weights[i, k] = value;
+                }
+            }
         }
 
         public void Process()
         {
             Matrix inputMatrix = new(_inputs);
             Matrix weightsMatrix = new(_weights);
+            Matrix inputMatrixTransposed = inputMatrix.Transpose();
+            Matrix outputsMatrix = weightsMatrix.Multiply(inputMatrixTransposed);
+            float[,] outputsMatrixArray = outputsMatrix.ToArray();
+            _outputs = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputsMatrixArray);
         }
 
         public void SetInputs(float[] inputs)
@@ -46,16 +73,30 @@ namespace Models.NeuralNetModels
 
         public float[] GetOutputs() => _outputs;
 
-        private void RandomizeWeights()
+        private float[] ConvertTwoDimensionalArrayToSingleDimensionalArray(float[,] mArray)
         {
-            for (int i = 0; i < _weights.GetLength(0); i++)
+            float[] sArray;
+            if (mArray.GetLength(0) == 1)
             {
-                for (int k = 0; k < _weights.GetLength(1); k++)
+                sArray = new float[mArray.GetLength(1)];
+                for (int i = 0; i < mArray.GetLength(1); i++)
                 {
-                    var rand = new Random();
-                    _weights[i, k] = (float)rand.NextDouble();
+                    sArray[i] = mArray[0, i];
                 }
             }
+            else if (mArray.GetLength(1) == 1)
+            {
+                sArray = new float[mArray.GetLength(0)];
+                for (int i = 0; i < mArray.GetLength(0); i++)
+                {
+                    sArray[i] = mArray[i, 0];
+                }
+            }
+            else
+            {
+                throw new IncorrectArrayDimensionsException();
+            }
+            return sArray;
         }
 
         private bool IsValidInputs(float[] inputs) => inputs.Length == _inputs.Length;

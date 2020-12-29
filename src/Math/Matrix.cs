@@ -86,5 +86,11 @@ namespace Math
             Matrix result = new(newMatrix);
             return result;
         }
+
+        public float[,] ToArray()
+        {
+            return _matrix;
+        }
+
     }
 }

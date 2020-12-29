@@ -1,4 +1,6 @@
 ﻿using Models.NeuralNetModels;
+using Models.NeuralNetModels.ActivationFunctions;
+using Moq;
 using System;
 using Xunit;
 
@@ -35,7 +37,40 @@ namespace Models.Test.NeuralNetModels
             Assert.Throws<ArgumentException>(() => network.SetInputs(inputs2));
         }
 
-        
+        [Fact]
+        public void InitializeWeightsWithSingle_ProcessShouldReturnZero_WhenZerosPassed()
+        {
+            Feedforward network = new(2, 1);
+            network.ActivationFunction = new EmptyActivationFunction();
+            network.SetInputs(new float[] { 1f, 1f });
+            
+            network.InitializeWeightsWithSingle(0f);
+
+            Assert.Equal(0f, network.GetOutputs()[0]);
+        }
+
+
+        /*[Fact]
+        public void Process_PassInputsAndActivationFunction()
+        {
+            Feedforward network = new(2, 1);
+            float[] inputs = { 0f, 0f };
+            network.SetInputs(inputs);
+            network.ActivationFunction = new BinaryStep();
+
+            network.Process();
+
+
+
+        }*/
+
+        class EmptyActivationFunction : IActivationFunction
+        {
+            public float Execute(float weightedSum)
+            {
+                return weightedSum;
+            }
+        }
 
     }
 }
