@@ -10,7 +10,8 @@ namespace Models.NeuralNetModels
 
         private float[] _inputs;
         private float[] _outputs;
-        private float[,] _weights;
+
+        public float[,] Weights { get; set; }
 
         public IActivationFunction ActivationFunction { get; set; }
 
@@ -26,28 +27,28 @@ namespace Models.NeuralNetModels
             }
             _inputs = new float[inputsNumber];
             _outputs = new float[outputsNumber];
-            _weights = new float[outputsNumber, inputsNumber];
+            Weights = new float[outputsNumber, inputsNumber];
         }
 
         public void InitializeWeightsWithRandomizer()
         {
             var rand = new Random();
-            for (int i = 0; i < _weights.GetLength(0); i++)
+            for (int i = 0; i < Weights.GetLength(0); i++)
             {
-                for (int k = 0; k < _weights.GetLength(1); k++)
+                for (int k = 0; k < Weights.GetLength(1); k++)
                 {
-                    _weights[i, k] = (float)rand.NextDouble();
+                    Weights[i, k] = (float)rand.NextDouble() * SignMultiplier();
                 }
             }
         }
 
         public void InitializeWeightsWithSingle(float value)
         {
-            for (int i = 0; i < _weights.GetLength(0); i++)
+            for (int i = 0; i < Weights.GetLength(0); i++)
             {
-                for (int k = 0; k < _weights.GetLength(1); k++)
+                for (int k = 0; k < Weights.GetLength(1); k++)
                 {
-                    _weights[i, k] = value;
+                    Weights[i, k] = value;
                 }
             }
         }
@@ -55,7 +56,7 @@ namespace Models.NeuralNetModels
         public void Process()
         {
             Matrix inputMatrix = new(_inputs);
-            Matrix weightsMatrix = new(_weights);
+            Matrix weightsMatrix = new(Weights);
             Matrix inputMatrixTransposed = inputMatrix.Transpose();
             Matrix outputsMatrix = weightsMatrix.Multiply(inputMatrixTransposed);
             float[,] outputsMatrixArray = outputsMatrix.ToArray();
@@ -73,7 +74,19 @@ namespace Models.NeuralNetModels
 
         public float[] GetOutputs() => _outputs;
 
-        private float[] ConvertTwoDimensionalArrayToSingleDimensionalArray(float[,] mArray)
+        public static int SignMultiplier()
+        {
+            int multiplier = 1;
+            var rand = new Random();
+            int value = rand.Next(0, 2);
+            if (value == 0)
+            {
+                multiplier = -1;
+            }
+            return multiplier;
+        }
+
+        private static float[] ConvertTwoDimensionalArrayToSingleDimensionalArray(float[,] mArray)
         {
             float[] sArray;
             if (mArray.GetLength(0) == 1)
