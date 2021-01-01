@@ -13,7 +13,7 @@ namespace Models.Test.NeuralNetModels
         [InlineData(-1, 3)]
         public void Constructor_PassNumberOfInputsLessThan1_GetException(int inputsNumber, int outputsNumber)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber, false));
         }
 
         [Theory]
@@ -21,13 +21,13 @@ namespace Models.Test.NeuralNetModels
         [InlineData(2, -1)]
         public void Constructor_PassNumberOfOutputsLessThan1_GetException(int inputsNumber, int outputsNumber)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber, false));
         }
 
         [Fact]
         public void SetInputs_PassArrayOfDifferentDimension_GetException()
         {
-            Feedforward network = new(3, 1);
+            Feedforward network = new(3, 1, false);
 
             float[] inputs1 = { 1.1f, 1.2f };
             float[] inputs2 = { 1.1f, 1.2f, 1.3f, 1.4f };
@@ -39,7 +39,7 @@ namespace Models.Test.NeuralNetModels
         [Fact]
         public void InitializeWeightsWithRandomizer_ProcessShouldReturnValuesBetweenMinusOneAndOne()
         {
-            Feedforward network = new(2, 1);
+            Feedforward network = new(2, 1, false);
 
             network.InitializeWeightsWithRandomizer();
 
@@ -55,7 +55,7 @@ namespace Models.Test.NeuralNetModels
         [Fact]
         public void InitializeWeightsWithSingle_ProcessShouldReturnZero_WhenZerosPassed()
         {
-            Feedforward network = new(2, 1);
+            Feedforward network = new(2, 1, false);
 
             network.InitializeWeightsWithSingle(0f);
 
@@ -65,7 +65,7 @@ namespace Models.Test.NeuralNetModels
         [Fact]
         public void Process_PassZeroesAsInputsWithoutBias_GetZero()
         {
-            Feedforward network = new(2, 1);
+            Feedforward network = new(2, 1, false);
             float[] inputs = { 0f, 0f };
             network.InitializeWeightsWithRandomizer();
             network.SetInputs(inputs);
@@ -79,7 +79,7 @@ namespace Models.Test.NeuralNetModels
         [Fact]
         public void Process_PassOnesAsInputsBinary_WithoutBias_GetTwo()
         {
-            Feedforward network = new(2, 1);
+            Feedforward network = new(2, 1, false);
             float[] inputs = { 1f, 1f };
             network.InitializeWeightsWithSingle(1f);
             network.SetInputs(inputs);
@@ -89,7 +89,18 @@ namespace Models.Test.NeuralNetModels
             Assert.Equal(2f, network.GetOutputs()[0]);
         }
 
-        
+        [Fact]
+        public void Process_PassOnesAsInputsBinary_WithBias_GetThree()
+        {
+            Feedforward network = new(2, 1, true);
+            float[] inputs = { 1f, 1f };
+            network.InitializeWeightsWithSingle(1f);
+            network.SetInputs(inputs);
+
+            network.Process();
+
+            Assert.Equal(3f, network.GetOutputs()[0]);
+        }
 
         class EmptyActivationFunction : IActivationFunction
         {

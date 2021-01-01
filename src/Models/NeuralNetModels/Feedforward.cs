@@ -11,11 +11,13 @@ namespace Models.NeuralNetModels
         private float[] _inputs;
         private float[] _outputs;
 
+        public bool HasBias { get; private set; }
+
         public float[,] Weights { get; set; }
 
         public IActivationFunction ActivationFunction { get; set; }
 
-        public Feedforward(int inputsNumber, int outputsNumber)
+        public Feedforward(int inputsNumber, int outputsNumber, bool hasBias)
         {
             if (!IsValidInputsNumber(inputsNumber))
             {
@@ -25,9 +27,14 @@ namespace Models.NeuralNetModels
             {
                 throw new ArgumentOutOfRangeException(paramName: nameof(outputsNumber), message: "Incorrent number of output items.");
             }
-            _inputs = new float[inputsNumber];
+            HasBias = hasBias;
+            if (HasBias)
+            {
+                inputsNumber++;
+            }
             _outputs = new float[outputsNumber];
-            Weights = new float[outputsNumber, inputsNumber];
+            _inputs = new float[inputsNumber];
+            Weights = new float[_outputs.Length, inputsNumber];
         }
 
         public void InitializeWeightsWithRandomizer()
@@ -58,6 +65,11 @@ namespace Models.NeuralNetModels
             Matrix inputMatrix = new(_inputs);
             Matrix weightsMatrix = new(Weights);
             Matrix inputMatrixTransposed = inputMatrix.Transpose();
+
+            var a = Weights;
+            var b = _inputs;
+            var c = _inputs;
+
             Matrix outputsMatrix = weightsMatrix.Multiply(inputMatrixTransposed);
             float[,] outputsMatrixArray = outputsMatrix.ToArray();
             _outputs = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputsMatrixArray);
@@ -65,11 +77,20 @@ namespace Models.NeuralNetModels
 
         public void SetInputs(float[] inputs)
         {
-            if (!IsValidInputs(inputs))
+            int inputsLength = inputs.Length;
+            if (HasBias)
+            {
+                inputsLength++;
+            }
+            if (!IsValidInputs(inputsLength))
             {
                 throw new ArgumentException(paramName: nameof(inputs), message: "Wrong number of input values.");
             }
-            _inputs = inputs;
+            Array.Copy(inputs, _inputs, inputs.Length);
+            if (HasBias)
+            {
+                _inputs[_inputs.Length - 1] = 1f;
+            }
         }
 
         public float[] GetOutputs() => _outputs;
@@ -112,7 +133,7 @@ namespace Models.NeuralNetModels
             return sArray;
         }
 
-        private bool IsValidInputs(float[] inputs) => inputs.Length == _inputs.Length;
+        private bool IsValidInputs(int inputsLength) => inputsLength == _inputs.Length;
 
         private static bool IsValidInputsNumber(int inputsNumber) => inputsNumber > 0;
 
