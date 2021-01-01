@@ -21,19 +21,16 @@ namespace Models.NeuralNetModels
         {
             if (!IsValidInputsNumber(inputsNumber))
             {
-                throw new ArgumentOutOfRangeException(paramName: nameof(inputsNumber), message: "Incorrent number of input items.");
+                throw new ArgumentOutOfRangeException(paramName: nameof(inputsNumber), message: "Incorrect number of input items.");
             }
             if (!IsValidOutputsNumber(outputsNumber))
             {
-                throw new ArgumentOutOfRangeException(paramName: nameof(outputsNumber), message: "Incorrent number of output items.");
+                throw new ArgumentOutOfRangeException(paramName: nameof(outputsNumber), message: "Incorrect number of output items.");
             }
             HasBias = hasBias;
-            if (HasBias)
-            {
-                inputsNumber++;
-            }
-            _outputs = new float[outputsNumber];
+            inputsNumber = IncreaseValueIfHasBias(inputsNumber);
             _inputs = new float[inputsNumber];
+            _outputs = new float[outputsNumber];
             Weights = new float[_outputs.Length, inputsNumber];
         }
 
@@ -65,11 +62,6 @@ namespace Models.NeuralNetModels
             Matrix inputMatrix = new(_inputs);
             Matrix weightsMatrix = new(Weights);
             Matrix inputMatrixTransposed = inputMatrix.Transpose();
-
-            var a = Weights;
-            var b = _inputs;
-            var c = _inputs;
-
             Matrix outputsMatrix = weightsMatrix.Multiply(inputMatrixTransposed);
             float[,] outputsMatrixArray = outputsMatrix.ToArray();
             _outputs = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputsMatrixArray);
@@ -78,13 +70,10 @@ namespace Models.NeuralNetModels
         public void SetInputs(float[] inputs)
         {
             int inputsLength = inputs.Length;
-            if (HasBias)
-            {
-                inputsLength++;
-            }
+            inputsLength = IncreaseValueIfHasBias(inputsLength);
             if (!IsValidInputs(inputsLength))
             {
-                throw new ArgumentException(paramName: nameof(inputs), message: "Wrong number of input values.");
+                throw new ArgumentException(paramName: nameof(inputs), message: "Incorrect number of input values.");
             }
             Array.Copy(inputs, _inputs, inputs.Length);
             if (HasBias)
@@ -105,6 +94,15 @@ namespace Models.NeuralNetModels
                 multiplier = -1;
             }
             return multiplier;
+        }
+
+        private int IncreaseValueIfHasBias(int value)
+        {
+            if (HasBias)
+            {
+                return ++value;
+            }
+            return value;
         }
 
         private static float[] ConvertTwoDimensionalArrayToSingleDimensionalArray(float[,] mArray)

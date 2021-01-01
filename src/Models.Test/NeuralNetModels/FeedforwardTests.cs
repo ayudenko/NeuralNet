@@ -77,7 +77,7 @@ namespace Models.Test.NeuralNetModels
         }
 
         [Fact]
-        public void Process_PassOnesAsInputsBinary_WithoutBias_GetTwo()
+        public void Process_PassOnesAsInputs_WithoutBias_GetTwo()
         {
             Feedforward network = new(2, 1, false);
             float[] inputs = { 1f, 1f };
@@ -90,7 +90,7 @@ namespace Models.Test.NeuralNetModels
         }
 
         [Fact]
-        public void Process_PassOnesAsInputsBinary_WithBias_GetThree()
+        public void Process_PassOnesAsInputs_WithBias_GetThree()
         {
             Feedforward network = new(2, 1, true);
             float[] inputs = { 1f, 1f };
