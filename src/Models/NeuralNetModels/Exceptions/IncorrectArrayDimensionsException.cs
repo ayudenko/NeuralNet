@@ -2,7 +2,7 @@
 
 namespace Models.NeuralNetModels.Exceptions
 {
-    class IncorrectArrayDimensionsException : Exception
+    public class IncorrectArrayDimensionsException : Exception
     {
     }
 }

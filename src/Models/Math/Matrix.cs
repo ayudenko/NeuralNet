@@ -1,6 +1,6 @@
-﻿using Math.Exceptions;
+﻿using Models.NeuralNetModels.Exceptions;
 
-namespace Math
+namespace Models.Math
 {
     public class Matrix
     {
@@ -28,7 +28,7 @@ namespace Math
         {
             if ((matrix.GetDimension0() != GetDimension0()) || (matrix.GetDimension1() != GetDimension1()))
             {
-                throw new IncorrectDimensionException();
+                throw new IncorrectArrayDimensionsException();
             }
             float[,] newMatrix = new float[GetDimension0(), GetDimension1()];
             for (int i = 0; i < GetDimension0(); i++)

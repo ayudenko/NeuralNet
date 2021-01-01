@@ -1,4 +1,4 @@
-﻿using Math;
+﻿using Models.Math;
 using Models.NeuralNetModels.ActivationFunctions;
 using Models.NeuralNetModels.Exceptions;
 using System;

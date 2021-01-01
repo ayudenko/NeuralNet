@@ -1,8 +1,9 @@
-using Math.Exceptions;
+using Models.Math;
+using Models.NeuralNetModels.Exceptions;
 using System;
 using Xunit;
 
-namespace Math.Test
+namespace Models.Test.Math
 {
     public class MatrixTests
     {
@@ -11,7 +12,7 @@ namespace Math.Test
         public void Constructor_PassArray()
         {
             float[] matrixItems = new float[] { 1, 2, 3 };
-            
+
             Matrix matrix = new(matrixItems);
 
             Assert.Equal(1, matrix.GetDimension0());
@@ -75,8 +76,8 @@ namespace Math.Test
             float[,] matrixItems4 = new float[,] { { 2, 3, 4 }, { 5, 6, 7 }, { 8, 9, 10 } };
             Matrix matrix4 = new(matrixItems4);
 
-            Assert.Throws<IncorrectDimensionException>(() => matrix1.Sum(matrix2));
-            Assert.Throws<IncorrectDimensionException>(() => matrix3.Sum(matrix4));
+            Assert.Throws<IncorrectArrayDimensionsException>(() => matrix1.Sum(matrix2));
+            Assert.Throws<IncorrectArrayDimensionsException>(() => matrix3.Sum(matrix4));
         }
 
         [Fact]
