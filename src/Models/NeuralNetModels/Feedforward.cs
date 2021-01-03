@@ -2,6 +2,7 @@
 using Models.NeuralNetModels.ActivationFunctions;
 using Models.NeuralNetModels.Exceptions;
 using System;
+using System.Linq;
 
 namespace Models.NeuralNetModels
 {
@@ -64,7 +65,8 @@ namespace Models.NeuralNetModels
             Matrix inputMatrixTransposed = inputMatrix.Transpose();
             Matrix outputsMatrix = weightsMatrix.Multiply(inputMatrixTransposed);
             float[,] outputsMatrixArray = outputsMatrix.ToArray();
-            _outputs = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputsMatrixArray);
+            float[] convertedOutputsMatrixArray = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputsMatrixArray);
+            _outputs = ApplyActivationFunction(convertedOutputsMatrixArray);
         }
 
         public void SetInputs(float[] inputs)
@@ -95,6 +97,9 @@ namespace Models.NeuralNetModels
             }
             return multiplier;
         }
+
+        private float[] ApplyActivationFunction(float[] weightedSums)
+            => weightedSums.Select(x => ActivationFunction.Execute(x)).ToArray();
 
         private int IncreaseValueIfHasBias(int value)
         {

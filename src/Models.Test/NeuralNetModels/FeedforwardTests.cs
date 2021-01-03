@@ -1,5 +1,6 @@
 ﻿using Models.NeuralNetModels;
 using Models.NeuralNetModels.ActivationFunctions;
+using Moq;
 using System;
 using Xunit;
 
@@ -69,6 +70,7 @@ namespace Models.Test.NeuralNetModels
             float[] inputs = { 0f, 0f };
             network.InitializeWeightsWithRandomizer();
             network.SetInputs(inputs);
+            network.ActivationFunction = new EmptyActivationFunction();
 
             network.Process();
 
@@ -82,6 +84,7 @@ namespace Models.Test.NeuralNetModels
             Feedforward network = new(2, 1, false);
             float[] inputs = { 1f, 1f };
             network.InitializeWeightsWithSingle(1f);
+            network.ActivationFunction = new EmptyActivationFunction();
             network.SetInputs(inputs);
 
             network.Process();
@@ -96,10 +99,29 @@ namespace Models.Test.NeuralNetModels
             float[] inputs = { 1f, 1f };
             network.InitializeWeightsWithSingle(1f);
             network.SetInputs(inputs);
+            network.ActivationFunction = new EmptyActivationFunction();
 
             network.Process();
 
             Assert.Equal(3f, network.GetOutputs()[0]);
+        }
+
+        [Fact]
+        public void Process_PassOnesAsInputsWithBinaryStepActivationFunction()
+        {
+            Feedforward network = new(2, 1, false);
+            float[] inputs = { 1f, 1f };
+
+            network.InitializeWeightsWithSingle(1f);
+            Mock<IActivationFunction> activationFunctionMock = new Mock<IActivationFunction>();
+            network.ActivationFunction = activationFunctionMock.Object;
+            network.SetInputs(inputs);
+
+            network.Process();
+            float output = network.GetOutputs()[0];
+
+            activationFunctionMock.Verify(v => v.Execute(It.IsAny<float>()));
+
         }
 
         class EmptyActivationFunction : IActivationFunction
