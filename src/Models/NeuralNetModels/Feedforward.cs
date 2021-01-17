@@ -98,6 +98,36 @@ namespace Models.NeuralNetModels
             return multiplier;
         }
 
+        public void AdjustWeightsWithError(float error)
+        {
+            float[] weightSumsByOutputs = GetWeightSumsByOutputs();
+            AdjustWeightsProportionally(weightSumsByOutputs, error);
+        }
+
+        private void AdjustWeightsProportionally(float[] weightSumsByOutputs, float error)
+        {
+            for (int i = 0; i < Weights.GetLength(0); i++)
+            {
+                for (int k = 0; k < Weights.GetLength(1); k++)
+                {
+                    Weights[i, k] = Weights[i, k] / weightSumsByOutputs[i] * error;
+                }
+            }
+        }
+
+        private float[] GetWeightSumsByOutputs()
+        {
+            float[] weightSumsByOutputs = new float[Weights.GetLength(0)];
+            for (int i = 0; i < Weights.GetLength(0); i++)
+            {
+                for (int k = 0; k < Weights.GetLength(1); k++)
+                {
+                    weightSumsByOutputs[i] += Weights[i, k];
+                }
+            }
+            return weightSumsByOutputs;
+        }
+
         private float[] ApplyActivationFunction(float[] weightedSums)
             => weightedSums.Select(x => ActivationFunction.Execute(x)).ToArray();
 

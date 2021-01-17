@@ -2,6 +2,7 @@
 using Models.NeuralNetModels.ActivationFunctions;
 using Moq;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Models.Test.NeuralNetModels
@@ -172,6 +173,28 @@ namespace Models.Test.NeuralNetModels
 
         }
 
+        [Theory]
+        [MemberData(nameof(WeightsData.Data), MemberType = typeof(WeightsData))]
+        public void AdjustWeightsWithError_SetWeightsWithSingleAndApplyErorAndEmptyActivatinFunction(float[] inputs, float[,] initialWeights, float error, bool hasBias, float[,] expectedWeights)
+        {
+            Feedforward network = new(2, 1, hasBias);
+            network.Weights = initialWeights;
+            network.ActivationFunction = new EmptyActivationFunction();
+            network.SetInputs(inputs);
+
+            network.Process();
+            network.AdjustWeightsWithError(error);
+            float[,] weights = network.Weights;
+
+            for (int i = 0; i < weights.GetLength(0); i++)
+            {
+                for (int k = 0; k < weights.GetLength(1); k++)
+                {
+                    Assert.Equal(expectedWeights[i, k], weights[i, k]);
+                }
+            }
+        }
+
         class EmptyActivationFunction : IActivationFunction
         {
             public float Execute(float weightedSum)
@@ -181,4 +204,16 @@ namespace Models.Test.NeuralNetModels
         }
 
     }
+
+    public class WeightsData
+    {
+
+        public static IEnumerable<object[]> Data =>
+            new List<object[]>
+            {
+                new object[] { new float[] { 0f, 0f }, new float[,] { { 1, 3 } }, 0.4f, false, new float[,] { { 0.1f, 0.3f } } },
+            };
+
+    }
+
 }
