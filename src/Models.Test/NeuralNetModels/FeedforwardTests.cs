@@ -201,6 +201,11 @@ namespace Models.Test.NeuralNetModels
             {
                 return weightedSum;
             }
+
+            public float GetDerivative(float input)
+            {
+                return 0;
+            }
         }
 
     }

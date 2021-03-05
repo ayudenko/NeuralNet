@@ -11,5 +11,10 @@
             }
             return 0;
         }
+
+        public float GetDerivative(float input)
+        {
+            return 0;
+        }
     }
 }

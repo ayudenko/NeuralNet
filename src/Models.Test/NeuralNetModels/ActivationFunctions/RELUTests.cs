@@ -19,5 +19,18 @@ namespace Models.Test.NeuralNetModels.ActivationFunctions
             Assert.Equal(result, output);
         }
 
+        [Theory]
+        [InlineData(3.2f, 1f)]
+        [InlineData(0f, 0f)]
+        [InlineData(-1.1f, 0f)]
+        public void GetDerivative_ShouldRetrunZeroOrOne(float weightedSum, float result)
+        {
+            IActivationFunction function = new RELU();
+
+            float output = function.GetDerivative(weightedSum);
+
+            Assert.Equal(result, output);
+        }
+
     }
 }

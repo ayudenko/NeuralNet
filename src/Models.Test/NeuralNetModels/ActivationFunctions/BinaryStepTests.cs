@@ -19,5 +19,15 @@ namespace Models.Test.NeuralNetModels.ActivationFunctions
             Assert.Equal(result, output);
         }
 
+        [Fact]
+        public void GetDerivative_ShouldReturnZero_WhenGivenAnyValue()
+        {
+            IActivationFunction function = new BinaryStep();
+
+            float output = function.GetDerivative(0f);
+
+            Assert.Equal(0f, output);
+        }
+
     }
 }

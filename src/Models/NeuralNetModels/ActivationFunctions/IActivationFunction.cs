@@ -5,5 +5,7 @@
 
         abstract float Execute(float weightedSum);
 
+        abstract float GetDerivative(float input);
+
     }
 }
