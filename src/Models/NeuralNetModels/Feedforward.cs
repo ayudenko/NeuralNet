@@ -12,13 +12,11 @@ namespace Models.NeuralNetModels
         private float[] _inputs;
         private float[] _outputs;
 
-        public bool HasBias { get; private set; }
-
         public float[,] Weights { get; set; }
 
         public IActivationFunction ActivationFunction { get; set; }
 
-        public Feedforward(int inputsNumber, int outputsNumber, bool hasBias)
+        public Feedforward(int inputsNumber, int outputsNumber)
         {
             if (!IsValidInputsNumber(inputsNumber))
             {
@@ -28,8 +26,7 @@ namespace Models.NeuralNetModels
             {
                 throw new ArgumentOutOfRangeException(paramName: nameof(outputsNumber), message: "Incorrect number of output items.");
             }
-            HasBias = hasBias;
-            inputsNumber = IncreaseValueIfHasBias(inputsNumber);
+            inputsNumber++;
             _inputs = new float[inputsNumber];
             _outputs = new float[outputsNumber];
             Weights = new float[_outputs.Length, inputsNumber];
@@ -72,16 +69,13 @@ namespace Models.NeuralNetModels
         public void SetInputs(float[] inputs)
         {
             int inputsLength = inputs.Length;
-            inputsLength = IncreaseValueIfHasBias(inputsLength);
+            inputsLength++;
             if (!IsValidInputs(inputsLength))
             {
                 throw new ArgumentException(paramName: nameof(inputs), message: "Incorrect number of input values.");
             }
             Array.Copy(inputs, _inputs, inputs.Length);
-            if (HasBias)
-            {
-                _inputs[_inputs.Length - 1] = 1f;
-            }
+            _inputs[^1] = 1f;
         }
 
         public float[] GetOutputs() => _outputs;
@@ -130,15 +124,6 @@ namespace Models.NeuralNetModels
 
         private float[] ApplyActivationFunction(float[] weightedSums)
             => weightedSums.Select(x => ActivationFunction.Execute(x)).ToArray();
-
-        private int IncreaseValueIfHasBias(int value)
-        {
-            if (HasBias)
-            {
-                return ++value;
-            }
-            return value;
-        }
 
         private static float[] ConvertTwoDimensionalArrayToSingleDimensionalArray(float[,] mArray)
         {

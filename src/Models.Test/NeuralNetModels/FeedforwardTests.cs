@@ -15,7 +15,7 @@ namespace Models.Test.NeuralNetModels
         [InlineData(-1, 3)]
         public void Constructor_PassNumberOfInputsLessThan1_GetException(int inputsNumber, int outputsNumber)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber, false));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
         }
 
         [Theory]
@@ -23,7 +23,7 @@ namespace Models.Test.NeuralNetModels
         [InlineData(2, -1)]
         public void Constructor_PassNumberOfOutputsLessThan1_GetException(int inputsNumber, int outputsNumber)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber, false));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
         }
 
         [Theory]
@@ -31,7 +31,7 @@ namespace Models.Test.NeuralNetModels
         [InlineData(new float[] { 1.1f, 1.2f, 1.3f, 1.4f })]
         public void SetInputs_PassArrayOfDifferentDimension_GetException(float[] inputs)
         {
-            Feedforward network = new(3, 1, false);
+            Feedforward network = new(3, 1);
 
             Assert.Throws<ArgumentException>(() => network.SetInputs(inputs));
         }
@@ -39,7 +39,7 @@ namespace Models.Test.NeuralNetModels
         [Fact]
         public void InitializeWeightsWithRandomizer_ProcessShouldReturnValuesBetweenMinusOneAndOne()
         {
-            Feedforward network = new(2, 1, false);
+            Feedforward network = new(2, 1);
 
             network.InitializeWeightsWithRandomizer();
 
@@ -58,7 +58,7 @@ namespace Models.Test.NeuralNetModels
         [InlineData(-2, -2)]
         public void InitializeWeightsWithSingle_ProcessShouldReturnZero_WhenZerosPassed(float initialWeight, float expectedWeight)
         {
-            Feedforward network = new(2, 1, false);
+            Feedforward network = new(2, 1);
 
             network.InitializeWeightsWithSingle(initialWeight);
 
@@ -69,55 +69,6 @@ namespace Models.Test.NeuralNetModels
                     Assert.Equal(expectedWeight, network.Weights[i, k]);
                 }
             }
-        }
-
-        [Fact]
-        public void Process_PassZeroesAsInputsWithoutBiasAndInitializeWeightsWithRandomizerAndEmptyActivationFunction_GetZero()
-        {
-            Feedforward network = new(2, 1, false);
-            float[] inputs = { 0f, 0f };
-            network.InitializeWeightsWithRandomizer();
-            network.SetInputs(inputs);
-            network.ActivationFunction = new EmptyActivationFunction();
-
-            network.Process();
-
-            Assert.Equal(0f, network.GetOutputs()[0]);
-
-        }
-
-        [Theory]
-        [InlineData(new float[] { 0f, 0f }, -1f, 0f)]
-        [InlineData(new float[] { 0f, 1f }, -1f, -1f)]
-        [InlineData(new float[] { 1f, 0f }, -1f, -1f)]
-        [InlineData(new float[] { 1f, 1f }, -1f, -2f)]
-        [InlineData(new float[] { 0f, -1f }, -1f, 1f)]
-        [InlineData(new float[] { -1f, 0f }, -1f, 1f)]
-        [InlineData(new float[] { -1f, -1f }, -1f, 2f)]
-        [InlineData(new float[] { 0f, 0f }, 0f, 0f)]
-        [InlineData(new float[] { 0f, 1f }, 0f, 0f)]
-        [InlineData(new float[] { 1f, 0f }, 0f, 0f)]
-        [InlineData(new float[] { 1f, 1f }, 0f, 0f)]
-        [InlineData(new float[] { 0f, -1f }, 0f, 0f)]
-        [InlineData(new float[] { -1f, 0f }, 0f, 0f)]
-        [InlineData(new float[] { -1f, -1f }, 0f, 0f)]
-        [InlineData(new float[] { 0f, 0f }, 1f, 0f)]
-        [InlineData(new float[] { 0f, 1f }, 1f, 1f)]
-        [InlineData(new float[] { 1f, 0f }, 1f, 1f)]
-        [InlineData(new float[] { 1f, 1f }, 1f, 2f)]
-        [InlineData(new float[] { 0f, -1f }, 1f, -1f)]
-        [InlineData(new float[] { -1f, 0f }, 1f, -1f)]
-        [InlineData(new float[] { -1f, -1f }, 1f, -2f)]
-        public void Process_PassInputsAndInitializeWeightsWithSingleAndEmptyActivationFunction_WithoutBias(float[] inputs, float weight, float expected)
-        {
-            Feedforward network = new(2, 1, false);
-            network.InitializeWeightsWithSingle(weight);
-            network.ActivationFunction = new EmptyActivationFunction();
-            network.SetInputs(inputs);
-
-            network.Process();
-
-            Assert.Equal(expected, network.GetOutputs()[0]);
         }
 
         [Theory]
@@ -144,9 +95,9 @@ namespace Models.Test.NeuralNetModels
         [InlineData(new float[] { 0f, -1f }, 1f, 0f)]
         [InlineData(new float[] { -1f, 0f }, 1f, 0f)]
         [InlineData(new float[] { -1f, -1f }, 1f, -1f)]
-        public void Process_PassInputsAndInitializeWeightsWithSingleAndEmptyActivationFunction_WithBias(float[] inputs, float weight, float expected)
+        public void Process_PassInputsAndInitializeWeightsWithSingleAndEmptyActivationFunction(float[] inputs, float weight, float expected)
         {
-            Feedforward network = new(2, 1, true);
+            Feedforward network = new(2, 1);
             network.InitializeWeightsWithSingle(weight);
             network.SetInputs(inputs);
             network.ActivationFunction = new EmptyActivationFunction();
@@ -159,7 +110,7 @@ namespace Models.Test.NeuralNetModels
         [Fact]
         public void Process_PassOnesAsInputsWithBinaryStepActivationFunction_ActivationFunctionShouldBeExecuted()
         {
-            Feedforward network = new(2, 1, false);
+            Feedforward network = new(2, 1);
             float[] inputs = new float[] { 1f, 1f };
             network.InitializeWeightsWithSingle(1f);
             Mock<IActivationFunction> activationFunctionMock = new Mock<IActivationFunction>();
@@ -175,9 +126,9 @@ namespace Models.Test.NeuralNetModels
 
         [Theory]
         [MemberData(nameof(WeightsData.Data), MemberType = typeof(WeightsData))]
-        public void AdjustWeightsWithError_SetWeightsWithSingleAndApplyErorAndEmptyActivatinFunction(float[] inputs, float[,] initialWeights, float error, bool hasBias, float[,] expectedWeights)
+        public void AdjustWeightsWithError_SetWeightsWithSingleAndApplyErorAndEmptyActivatinFunction(float[] inputs, float[,] initialWeights, float error, float[,] expectedWeights)
         {
-            Feedforward network = new(2, 1, hasBias);
+            Feedforward network = new(2, 1);
             network.Weights = initialWeights;
             network.ActivationFunction = new EmptyActivationFunction();
             network.SetInputs(inputs);
@@ -216,7 +167,7 @@ namespace Models.Test.NeuralNetModels
         public static IEnumerable<object[]> Data =>
             new List<object[]>
             {
-                new object[] { new float[] { 0f, 0f }, new float[,] { { 1, 3 } }, 0.4f, false, new float[,] { { 0.1f, 0.3f } } },
+                new object[] { new float[] { 0f, 0f }, new float[,] { { 1, 3 } }, 0.4f, new float[,] { { 0.1f, 0.3f } } },
             };
 
     }
