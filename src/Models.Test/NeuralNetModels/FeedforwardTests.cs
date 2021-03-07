@@ -56,26 +56,13 @@ namespace Models.Test.NeuralNetModels
         {
             Feedforward network = new(new int[] { 4, 3, 2 });
 
-            network.ActivationFunction = new EmptyActivationFunction();
+            network.ActivationFunction = new Identity();
             network.InitializeWeightsWithSingle(initializer);
             network.SetInputs(input);
 
             network.Process();
 
             Assert.Equal(output, network.GetOutputs());
-        }
-
-        class EmptyActivationFunction : IActivationFunction
-        {
-            public float Execute(float weightedSum)
-            {
-                return weightedSum;
-            }
-
-            public float GetDerivative(float input)
-            {
-                return 0;
-            }
         }
 
     }

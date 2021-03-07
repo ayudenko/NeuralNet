@@ -3,20 +3,20 @@ using Xunit;
 
 namespace Models.Test.NeuralNetModels.ActivationFunctions
 {
-    public class RELUTests
+    public class IdentityTests
     {
 
         private readonly IActivationFunction _sut;
 
-        public RELUTests()
+        public IdentityTests()
         {
-            _sut = new RELU();
+            _sut = new Identity();
         }
 
         [Theory]
         [InlineData(3.2f, 3.2f)]
         [InlineData(0f, 0f)]
-        [InlineData(-1.1f, 0f)]
+        [InlineData(-1.1f, -1.1f)]
         public void Execute_ShouldReturnMaxValeFromZeroAndGivenValue(float weightedSum, float result)
         {
             float output = _sut.Execute(weightedSum);
@@ -25,7 +25,7 @@ namespace Models.Test.NeuralNetModels.ActivationFunctions
         }
 
         [Theory]
-        [InlineData(3.2f, 1f)]
+        [InlineData(3.2f, 0f)]
         [InlineData(0f, 0f)]
         [InlineData(-1.1f, 0f)]
         public void GetDerivative_ShouldRetrunZeroOrOne(float weightedSum, float result)
