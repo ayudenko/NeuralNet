@@ -50,8 +50,8 @@ namespace Models.Test.NeuralNetModels
         }
 
         [Theory]
-        [InlineData(1f, new float[] { 1f, 2f, 3f, 4f }, new float[] { 30f, 30f })]
-        [InlineData(1f, new float[] { 1f, -2f, 3f, -4f }, new float[] { -6f, -6f })]
+        [InlineData(1f, new float[] { 1f, 2f, 3f, 4f }, new float[] { 31f, 31f })]
+        [InlineData(1f, new float[] { 1f, -2f, 3f, -4f }, new float[] { -5f, -5f })]
         public void Process_InitialWeightsWithZeroesAndPassInpt_GetCorrectOutput(float initializer, float[] input, float[] output)
         {
             Feedforward network = new(new int[] { 4, 3, 2 });

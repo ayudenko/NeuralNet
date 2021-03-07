@@ -38,10 +38,10 @@ namespace Models.NeuralNetModels
             }
             for (int i = 0; i < _netWeights.Length; i++)
             {
-                _netWeights[i] = new float[layers[i+1], layers[i]];
+                _netWeights[i] = new float[layers[i + 1], layers[i]];
             }
             for (int i = 0; i < _biases.Length; i++)
-            { 
+            {
                 _biases[i] = new float[layers[i + 2]];
             }
         }
@@ -59,6 +59,13 @@ namespace Models.NeuralNetModels
                     }
                 }
             }
+            foreach (var bias in _biases)
+            {
+                for (int i = 0; i < bias.Length; i++)
+                {
+                    bias[i] = (float)rand.NextDouble() * SignMultiplier();
+                }
+            }
 
         }
 
@@ -72,6 +79,13 @@ namespace Models.NeuralNetModels
                     {
                         weights[i, k] = value;
                     }
+                }
+            }
+            foreach (var bias in _biases)
+            {
+                for (int i = 0; i < bias.Length; i++)
+                {
+                    bias[i] = value;
                 }
             }
         }
@@ -97,7 +111,13 @@ namespace Models.NeuralNetModels
             for (int i = 0; i < layersMatrixes.Length - 1; i++)
             {
                 Matrix inputMatrix = layersMatrixes[i].Transpose();
-                float[,] outputMatrixArray = weightsMatrixes[i].Multiply(inputMatrix).ToArray();
+                Matrix outputMatrix = weightsMatrixes[i].Multiply(inputMatrix);
+                if (i > 0)
+                {
+                    Matrix biasMatrix = biasesMatrixes[i-1].Transpose();
+                    outputMatrix = outputMatrix.Sum(biasMatrix);
+                }
+                float[,] outputMatrixArray = outputMatrix.ToArray();
                 float[] convertedOutputsMatrixArray = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputMatrixArray);
                 float[] outputs = ApplyActivationFunction(convertedOutputsMatrixArray);
                 _layers[i + 1] = outputs;
