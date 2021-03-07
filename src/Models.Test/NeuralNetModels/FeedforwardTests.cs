@@ -1,6 +1,5 @@
 ﻿using Models.NeuralNetModels;
 using Models.NeuralNetModels.ActivationFunctions;
-using Moq;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -19,11 +18,11 @@ namespace Models.Test.NeuralNetModels
         [InlineData(new int[] { 0, 3, 2 })]
         [InlineData(new int[] { 1, -3, 2 })]
         [InlineData(new int[] { 1, 3, -2 })]
-        public void Constructor_PassNumberOfInputsLessThan1_GetException(int[] layers)
+        public void Constructor_PassNumberOfNodesLessThan1_GetException(int[] layers)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(layers));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(layers, new Identity()));
         }
-        
+
         [Theory]
         [InlineData(new int[] { 1, 2, 3 }, 3)]
         [InlineData(new int[] { 2, 3, 4 }, 4)]
@@ -31,8 +30,8 @@ namespace Models.Test.NeuralNetModels
         [InlineData(new int[] { 2, 2, 2 }, 2)]
         public void Constructor_PassNumberOfOutputs_GetTheSameNumber(int[] layers, int expectedOutputsNumber)
         {
-            Feedforward network = new(layers);
-            
+            Feedforward network = new(layers, new Identity());
+
             var outputs = network.GetOutputs();
 
             Assert.Equal(expectedOutputsNumber, outputs.Length);
@@ -44,7 +43,7 @@ namespace Models.Test.NeuralNetModels
         [InlineData(new float[] { 1.1f, 1.2f, 1.3f, 1.4f, 1.5f })]
         public void SetInputs_PassArrayOfDifferentDimension_GetException(float[] inputs)
         {
-            Feedforward network = new(new int[] { 4, 3, 2 });
+            Feedforward network = new(new int[] { 4, 3, 2 }, new Identity());
 
             Assert.Throws<ArgumentException>(() => network.SetInputs(inputs));
         }
@@ -54,15 +53,40 @@ namespace Models.Test.NeuralNetModels
         [InlineData(1f, new float[] { 1f, -2f, 3f, -4f }, new float[] { -5f, -5f })]
         public void Process_InitialWeightsWithZeroesAndPassInpt_GetCorrectOutput(float initializer, float[] input, float[] output)
         {
-            Feedforward network = new(new int[] { 4, 3, 2 });
+            Feedforward network = new(new int[] { 4, 3, 2 }, new Identity());
 
-            network.ActivationFunction = new Identity();
             network.InitializeWeightsWithSingle(initializer);
             network.SetInputs(input);
 
             network.Process();
 
             Assert.Equal(output, network.GetOutputs());
+        }
+
+        [Fact]
+        public void Process_PassOneLayer_GetInputsAsOutput()
+        {
+            Feedforward network = new(new int[] { 2 }, new Identity());
+            network.InitializeWeightsWithSingle(0f);
+            network.SetInputs(new float[] { 1f, 2f });
+
+            network.Process();
+
+            Assert.Equal(new float[] { 1f, 2f }, network.GetOutputs());
+        }
+
+        [Theory]
+        [InlineData(new int[] { 3, 2 }, 1f, new float[] { 1f, 2f, 3f }, new float[] { 6f, 6f })]
+        [InlineData(new int[] { 3, 2 }, 0f, new float[] { 1f, 2f, 3f }, new float[] { 0f, 0f })]
+        public void Process_PassTwoLayers_GetCorrectOutput(int[] layers, float initializer, float[] inputs, float[] expected)
+        {
+            Feedforward network = new(layers, new Identity());
+            network.InitializeWeightsWithSingle(initializer);
+            network.SetInputs(inputs);
+
+            network.Process();
+
+            Assert.Equal(expected, network.GetOutputs());
         }
 
     }

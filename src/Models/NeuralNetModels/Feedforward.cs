@@ -11,16 +11,17 @@ namespace Models.NeuralNetModels
 
         private float[] _outputs;
 
-        private readonly float[][,] _netWeights;
+        private readonly float[][,] _weights;
 
         private readonly float[][] _biases;
 
         private readonly float[][] _layers;
 
-        public IActivationFunction ActivationFunction { get; set; }
+        private readonly IActivationFunction _activationFunction;
 
-        public Feedforward(int[] layers)
+        public Feedforward(int[] layers, IActivationFunction activationFunction)
         {
+            _activationFunction = activationFunction;
             for (int i = 0; i < layers.Length; i++)
             {
                 if (!IsValidNodesNumber(layers[i]))
@@ -28,17 +29,17 @@ namespace Models.NeuralNetModels
                     throw new ArgumentOutOfRangeException(paramName: i.ToString(), message: "Incorrect number of layer items.");
                 }
             }
-            _netWeights = new float[layers.Length - 1][,];
-            _biases = new float[layers.Length - 2][];
+            _weights = new float[layers.Length - 1][,];
+            _biases = layers.Length > 2 ? new float[layers.Length - 2][] : new float[][] { };
             _layers = new float[layers.Length][];
             _outputs = new float[layers.Last()];
             for (int i = 0; i < layers.Length; i++)
             {
                 _layers[i] = new float[layers[i]];
             }
-            for (int i = 0; i < _netWeights.Length; i++)
+            for (int i = 0; i < _weights.Length; i++)
             {
-                _netWeights[i] = new float[layers[i + 1], layers[i]];
+                _weights[i] = new float[layers[i + 1], layers[i]];
             }
             for (int i = 0; i < _biases.Length; i++)
             {
@@ -49,7 +50,7 @@ namespace Models.NeuralNetModels
         public void InitializeWeightsWithRandomizer()
         {
             var rand = new Random();
-            foreach (var weights in _netWeights)
+            foreach (var weights in _weights)
             {
                 for (int i = 0; i < weights.GetLength(0); i++)
                 {
@@ -71,7 +72,7 @@ namespace Models.NeuralNetModels
 
         public void InitializeWeightsWithSingle(float value)
         {
-            foreach (var weights in _netWeights)
+            foreach (var weights in _weights)
             {
                 for (int i = 0; i < weights.GetLength(0); i++)
                 {
@@ -92,10 +93,10 @@ namespace Models.NeuralNetModels
 
         public void Process()
         {
-            Matrix[] weightsMatrixes = new Matrix[_netWeights.Length];
-            for (int i = 0; i < _netWeights.Length; i++)
+            Matrix[] weightsMatrixes = new Matrix[_weights.Length];
+            for (int i = 0; i < _weights.Length; i++)
             {
-                weightsMatrixes[i] = new Matrix(_netWeights[i]);
+                weightsMatrixes[i] = new Matrix(_weights[i]);
             }
             Matrix[] biasesMatrixes = new Matrix[_biases.Length];
             for (int i = 0; i < _biases.Length; i++)
@@ -150,7 +151,7 @@ namespace Models.NeuralNetModels
         }
 
         private float[] ApplyActivationFunction(float[] weightedSums)
-            => weightedSums.Select(x => ActivationFunction.Execute(x)).ToArray();
+            => weightedSums.Select(x => _activationFunction.Execute(x)).ToArray();
 
         private static float[] ConvertTwoDimensionalArrayToSingleDimensionalArray(float[,] mArray)
         {
