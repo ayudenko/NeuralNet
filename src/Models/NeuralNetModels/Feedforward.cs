@@ -36,7 +36,6 @@ namespace Models.NeuralNetModels
         {
             InitializeWeights(GetRanomizedValue);
             InitializeBiases(GetRanomizedValue);
-            var a = _biases;
         }
 
         public void InitializeWeightsWithSingle(float value)
