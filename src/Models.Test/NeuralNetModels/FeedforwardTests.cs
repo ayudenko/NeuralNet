@@ -10,140 +10,59 @@ namespace Models.Test.NeuralNetModels
     public class FeedforwardTests
     {
 
-        [Theory]
-        [InlineData(0, 3)]
-        [InlineData(-1, 3)]
-        public void Constructor_PassNumberOfInputsLessThan1_GetException(int inputsNumber, int outputsNumber)
+        public FeedforwardTests()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
+
         }
 
         [Theory]
-        [InlineData(2, 0)]
-        [InlineData(2, -1)]
-        public void Constructor_PassNumberOfOutputsLessThan1_GetException(int inputsNumber, int outputsNumber)
+        [InlineData(new int[] { 0, 3, 2 })]
+        [InlineData(new int[] { 1, -3, 2 })]
+        [InlineData(new int[] { 1, 3, -2 })]
+        public void Constructor_PassNumberOfInputsLessThan1_GetException(int[] layers)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(inputsNumber, outputsNumber));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Feedforward(layers));
+        }
+        
+        [Theory]
+        [InlineData(new int[] { 1, 2, 3 }, 3)]
+        [InlineData(new int[] { 2, 3, 4 }, 4)]
+        [InlineData(new int[] { 3, 2, 1 }, 1)]
+        [InlineData(new int[] { 2, 2, 2 }, 2)]
+        public void Constructor_PassNumberOfOutputs_GetTheSameNumber(int[] layers, int expectedOutputsNumber)
+        {
+            Feedforward network = new(layers);
+            
+            var outputs = network.GetOutputs();
+
+            Assert.Equal(expectedOutputsNumber, outputs.Length);
         }
 
         [Theory]
         [InlineData(new float[] { 1.1f, 1.2f })]
-        [InlineData(new float[] { 1.1f, 1.2f, 1.3f, 1.4f })]
+        [InlineData(new float[] { 1.1f, 1.2f, 1.3f })]
+        [InlineData(new float[] { 1.1f, 1.2f, 1.3f, 1.4f, 1.5f })]
         public void SetInputs_PassArrayOfDifferentDimension_GetException(float[] inputs)
         {
-            Feedforward network = new(3, 1);
+            Feedforward network = new(new int[] { 4, 3, 2 });
 
             Assert.Throws<ArgumentException>(() => network.SetInputs(inputs));
         }
 
-        [Fact]
-        public void InitializeWeightsWithRandomizer_ProcessShouldReturnValuesBetweenMinusOneAndOne()
-        {
-            Feedforward network = new(2, 1);
-
-            network.InitializeWeightsWithRandomizer();
-
-            for (int i = 0; i < network.Weights.GetLength(0); i++)
-            {
-                for (int k = 0; k < network.Weights.GetLength(1); k++)
-                {
-                    Assert.InRange<float>(network.Weights[i, k], -1, 1);
-                }
-            }
-        }
-
         [Theory]
-        [InlineData(0, 0)]
-        [InlineData(1, 1)]
-        [InlineData(-2, -2)]
-        public void InitializeWeightsWithSingle_ProcessShouldReturnZero_WhenZerosPassed(float initialWeight, float expectedWeight)
+        [InlineData(1f, new float[] { 1f, 2f, 3f, 4f }, new float[] { 30f, 30f })]
+        [InlineData(1f, new float[] { 1f, -2f, 3f, -4f }, new float[] { -6f, -6f })]
+        public void Process_InitialWeightsWithZeroesAndPassInpt_GetCorrectOutput(float initializer, float[] input, float[] output)
         {
-            Feedforward network = new(2, 1);
+            Feedforward network = new(new int[] { 4, 3, 2 });
 
-            network.InitializeWeightsWithSingle(initialWeight);
-
-            for (int i = 0; i < network.Weights.GetLength(0); i++)
-            {
-                for (int k = 0; k < network.Weights.GetLength(1); k++)
-                {
-                    Assert.Equal(expectedWeight, network.Weights[i, k]);
-                }
-            }
-        }
-
-        [Theory]
-        [InlineData(new float[] { 0f, 0f }, -1f, -1f)]
-        [InlineData(new float[] { 0f, 1f }, -1f, -2f)]
-        [InlineData(new float[] { 1f, 0f }, -1f, -2f)]
-        [InlineData(new float[] { 1f, 1f }, -1f, -3f)]
-        [InlineData(new float[] { 0f, -1f }, -1f, 0f)]
-        [InlineData(new float[] { -1f, 0f }, -1f, 0f)]
-        [InlineData(new float[] { -1f, -1f }, -1f, 1f)]
-
-        [InlineData(new float[] { 0f, 0f }, 0f, 0f)]
-        [InlineData(new float[] { 0f, 1f }, 0f, 0f)]
-        [InlineData(new float[] { 1f, 0f }, 0f, 0f)]
-        [InlineData(new float[] { 1f, 1f }, 0f, 0f)]
-        [InlineData(new float[] { 0f, -1f }, 0f, 0f)]
-        [InlineData(new float[] { -1f, 0f }, 0f, 0f)]
-        [InlineData(new float[] { -1f, -1f }, 0f, 0f)]
-
-        [InlineData(new float[] { 0f, 0f }, 1f, 1f)]
-        [InlineData(new float[] { 0f, 1f }, 1f, 2f)]
-        [InlineData(new float[] { 1f, 0f }, 1f, 2f)]
-        [InlineData(new float[] { 1f, 1f }, 1f, 3f)]
-        [InlineData(new float[] { 0f, -1f }, 1f, 0f)]
-        [InlineData(new float[] { -1f, 0f }, 1f, 0f)]
-        [InlineData(new float[] { -1f, -1f }, 1f, -1f)]
-        public void Process_PassInputsAndInitializeWeightsWithSingleAndEmptyActivationFunction(float[] inputs, float weight, float expected)
-        {
-            Feedforward network = new(2, 1);
-            network.InitializeWeightsWithSingle(weight);
-            network.SetInputs(inputs);
             network.ActivationFunction = new EmptyActivationFunction();
+            network.InitializeWeightsWithSingle(initializer);
+            network.SetInputs(input);
 
             network.Process();
 
-            Assert.Equal(expected, network.GetOutputs()[0]);
-        }
-
-        [Fact]
-        public void Process_PassOnesAsInputsWithBinaryStepActivationFunction_ActivationFunctionShouldBeExecuted()
-        {
-            Feedforward network = new(2, 1);
-            float[] inputs = new float[] { 1f, 1f };
-            network.InitializeWeightsWithSingle(1f);
-            Mock<IActivationFunction> activationFunctionMock = new Mock<IActivationFunction>();
-            network.ActivationFunction = activationFunctionMock.Object;
-            network.SetInputs(inputs);
-
-            network.Process();
-            float output = network.GetOutputs()[0];
-
-            activationFunctionMock.Verify(v => v.Execute(It.IsAny<float>()));
-
-        }
-
-        [Theory]
-        [MemberData(nameof(WeightsData.Data), MemberType = typeof(WeightsData))]
-        public void AdjustWeightsWithError_SetWeightsWithSingleAndApplyErorAndEmptyActivatinFunction(float[] inputs, float[,] initialWeights, float error, float[,] expectedWeights)
-        {
-            Feedforward network = new(2, 1);
-            network.Weights = initialWeights;
-            network.ActivationFunction = new EmptyActivationFunction();
-            network.SetInputs(inputs);
-
-            network.Process();
-            network.AdjustWeightsWithError(error);
-            float[,] weights = network.Weights;
-
-            for (int i = 0; i < weights.GetLength(0); i++)
-            {
-                for (int k = 0; k < weights.GetLength(1); k++)
-                {
-                    Assert.Equal(expectedWeights[i, k], weights[i, k]);
-                }
-            }
+            Assert.Equal(output, network.GetOutputs());
         }
 
         class EmptyActivationFunction : IActivationFunction
