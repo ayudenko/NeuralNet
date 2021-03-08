@@ -2,6 +2,7 @@
 using Models.NeuralNetModels.ActivationFunctions;
 using Models.NeuralNetModels.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Models.NeuralNetModels
@@ -74,22 +75,9 @@ namespace Models.NeuralNetModels
 
         public void Process()
         {
-            Matrix[] weightsMatrixes = new Matrix[_weights.Length];
-            for (int i = 0; i < _weights.Length; i++)
-            {
-                weightsMatrixes[i] = new Matrix(_weights[i]);
-            }
-            Matrix[] biasesMatrixes = new Matrix[_biases.Length];
-            for (int i = 0; i < _biases.Length; i++)
-            {
-                biasesMatrixes[i] = new Matrix(_biases[i]);
-            }
-            Matrix[] layersMatrixes = new Matrix[_layers.Length];
-            for (int i = 0; i < _layers.Length; i++)
-            {
-                layersMatrixes[i] = new Matrix(_layers[i]);
-            }
-
+            Matrix[] weightsMatrixes = ConvertJaggedArrayToArrayOfMatrixes(_weights);
+            Matrix[] biasesMatrixes = ConvertJaggedArrayToArrayOfMatrixes(_biases);
+            Matrix[] layersMatrixes = ConvertJaggedArrayToArrayOfMatrixes(_layers);
             for (int i = 0; i < layersMatrixes.Length - 1; i++)
             {
                 Matrix inputMatrix = layersMatrixes[i].Transpose();
@@ -119,7 +107,27 @@ namespace Models.NeuralNetModels
 
         public float[] GetOutputs() => _outputs;
 
-        public int SignMultiplier()
+        private static Matrix[] ConvertJaggedArrayToArrayOfMatrixes(float[][,] array)
+        {
+            Matrix[] matrixes = new Matrix[array.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                matrixes[i] = new Matrix(array[i]);
+            }
+            return matrixes;
+        }
+
+        private static Matrix[] ConvertJaggedArrayToArrayOfMatrixes(float[][] array)
+        {
+            Matrix[] matrixes = new Matrix[array.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                matrixes[i] = new Matrix(array[i]);
+            }
+            return matrixes;
+        }
+
+        private int SignMultiplier()
         {
             int multiplier = 1;
             int value = _rand.Next(0, 2);
