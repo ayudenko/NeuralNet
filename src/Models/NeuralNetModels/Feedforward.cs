@@ -2,6 +2,7 @@
 using Models.NeuralNetModels.ActivationFunctions;
 using Models.NeuralNetModels.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Models.NeuralNetModels
@@ -9,88 +10,127 @@ namespace Models.NeuralNetModels
     public class Feedforward
     {
 
-        private float[] _inputs;
         private float[] _outputs;
 
-        public bool HasBias { get; private set; }
+        private readonly float[][,] _weights;
 
-        public float[,] Weights { get; set; }
+        private readonly float[][] _biases;
 
-        public IActivationFunction ActivationFunction { get; set; }
+        private readonly float[][] _layers;
 
-        public Feedforward(int inputsNumber, int outputsNumber, bool hasBias)
+        private readonly IActivationFunction _activationFunction;
+
+        private readonly Random _rand = new Random();
+
+        public Feedforward(int[] layers, IActivationFunction activationFunction)
         {
-            if (!IsValidInputsNumber(inputsNumber))
-            {
-                throw new ArgumentOutOfRangeException(paramName: nameof(inputsNumber), message: "Incorrect number of input items.");
-            }
-            if (!IsValidOutputsNumber(outputsNumber))
-            {
-                throw new ArgumentOutOfRangeException(paramName: nameof(outputsNumber), message: "Incorrect number of output items.");
-            }
-            HasBias = hasBias;
-            inputsNumber = IncreaseValueIfHasBias(inputsNumber);
-            _inputs = new float[inputsNumber];
-            _outputs = new float[outputsNumber];
-            Weights = new float[_outputs.Length, inputsNumber];
+            _activationFunction = activationFunction;
+            ThrowExceptionForInvalidLayerDimension(layers);
+            _weights = new float[layers.Length - 1][,];
+            _biases = layers.Length > 2 ? new float[layers.Length - 2][] : Array.Empty<float[]>();
+            _layers = new float[layers.Length][];
+            _outputs = new float[layers.Last()];
+            InitializeNetworkData(layers);
         }
 
         public void InitializeWeightsWithRandomizer()
         {
-            var rand = new Random();
-            for (int i = 0; i < Weights.GetLength(0); i++)
-            {
-                for (int k = 0; k < Weights.GetLength(1); k++)
-                {
-                    Weights[i, k] = (float)rand.NextDouble() * SignMultiplier();
-                }
-            }
+            InitializeWeights(GetRanomizedValue);
+            InitializeBiases(GetRanomizedValue);
         }
 
         public void InitializeWeightsWithSingle(float value)
         {
-            for (int i = 0; i < Weights.GetLength(0); i++)
+            InitializeWeights(() => value);
+            InitializeBiases(() => value);
+        }
+
+        private float GetRanomizedValue()
+            => (float)_rand.NextDouble() * SignMultiplier();
+
+        private void InitializeWeights(Func<float> initializerValue)
+        {
+            foreach (var weights in _weights)
             {
-                for (int k = 0; k < Weights.GetLength(1); k++)
+                for (int i = 0; i < weights.GetLength(0); i++)
                 {
-                    Weights[i, k] = value;
+                    for (int k = 0; k < weights.GetLength(1); k++)
+                    {
+                        weights[i, k] = initializerValue.Invoke();
+                    }
+                }
+            }
+        }
+
+        private void InitializeBiases(Func<float> initializerValue)
+        {
+            foreach (var biases in _biases)
+            {
+                for (int i = 0; i < biases.Length; i++)
+                {
+                    biases[i] = initializerValue.Invoke();
                 }
             }
         }
 
         public void Process()
         {
-            Matrix inputMatrix = new(_inputs);
-            Matrix weightsMatrix = new(Weights);
-            Matrix inputMatrixTransposed = inputMatrix.Transpose();
-            Matrix outputsMatrix = weightsMatrix.Multiply(inputMatrixTransposed);
-            float[,] outputsMatrixArray = outputsMatrix.ToArray();
-            float[] convertedOutputsMatrixArray = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputsMatrixArray);
-            _outputs = ApplyActivationFunction(convertedOutputsMatrixArray);
+            Matrix[] weightsMatrixes = ConvertJaggedArrayToArrayOfMatrixes(_weights);
+            Matrix[] biasesMatrixes = ConvertJaggedArrayToArrayOfMatrixes(_biases);
+            Matrix[] layersMatrixes = ConvertJaggedArrayToArrayOfMatrixes(_layers);
+            for (int i = 0; i < layersMatrixes.Length - 1; i++)
+            {
+                Matrix inputMatrix = layersMatrixes[i].Transpose();
+                Matrix outputMatrix = weightsMatrixes[i].Multiply(inputMatrix);
+                if (i > 0)
+                {
+                    Matrix biasMatrix = biasesMatrixes[i - 1].Transpose();
+                    outputMatrix = outputMatrix.Sum(biasMatrix);
+                }
+                float[,] outputMatrixArray = outputMatrix.ToArray();
+                float[] convertedOutputsMatrixArray = ConvertTwoDimensionalArrayToSingleDimensionalArray(outputMatrixArray);
+                float[] outputs = ApplyActivationFunction(convertedOutputsMatrixArray);
+                _layers[i + 1] = outputs;
+                layersMatrixes[i + 1] = new Matrix(outputs);
+            }
+            _outputs = _layers[^1];
         }
 
         public void SetInputs(float[] inputs)
         {
-            int inputsLength = inputs.Length;
-            inputsLength = IncreaseValueIfHasBias(inputsLength);
-            if (!IsValidInputs(inputsLength))
+            if (!IsValidInputs(inputs.Length))
             {
                 throw new ArgumentException(paramName: nameof(inputs), message: "Incorrect number of input values.");
             }
-            Array.Copy(inputs, _inputs, inputs.Length);
-            if (HasBias)
-            {
-                _inputs[_inputs.Length - 1] = 1f;
-            }
+            _layers[0] = inputs;
         }
 
         public float[] GetOutputs() => _outputs;
 
-        public static int SignMultiplier()
+        private static Matrix[] ConvertJaggedArrayToArrayOfMatrixes(float[][,] array)
+        {
+            Matrix[] matrixes = new Matrix[array.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                matrixes[i] = new Matrix(array[i]);
+            }
+            return matrixes;
+        }
+
+        private static Matrix[] ConvertJaggedArrayToArrayOfMatrixes(float[][] array)
+        {
+            Matrix[] matrixes = new Matrix[array.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                matrixes[i] = new Matrix(array[i]);
+            }
+            return matrixes;
+        }
+
+        private int SignMultiplier()
         {
             int multiplier = 1;
-            var rand = new Random();
-            int value = rand.Next(0, 2);
+            int value = _rand.Next(0, 2);
             if (value == 0)
             {
                 multiplier = -1;
@@ -98,47 +138,39 @@ namespace Models.NeuralNetModels
             return multiplier;
         }
 
-        public void AdjustWeightsWithError(float error)
+        private void InitializeNetworkData(int[] layers)
         {
-            float[] weightSumsByOutputs = GetWeightSumsByOutputs();
-            AdjustWeightsProportionally(weightSumsByOutputs, error);
+            InitializeLayers(layers);
+            InitializeWeights(layers);
+            InitializeBiases(layers);
         }
 
-        private void AdjustWeightsProportionally(float[] weightSumsByOutputs, float error)
+        private void InitializeLayers(int[] layers)
         {
-            for (int i = 0; i < Weights.GetLength(0); i++)
+            for (int i = 0; i < layers.Length; i++)
             {
-                for (int k = 0; k < Weights.GetLength(1); k++)
-                {
-                    Weights[i, k] = Weights[i, k] / weightSumsByOutputs[i] * error;
-                }
+                _layers[i] = new float[layers[i]];
             }
         }
 
-        private float[] GetWeightSumsByOutputs()
+        private void InitializeWeights(int[] layers)
         {
-            float[] weightSumsByOutputs = new float[Weights.GetLength(0)];
-            for (int i = 0; i < Weights.GetLength(0); i++)
+            for (int i = 0; i < _weights.Length; i++)
             {
-                for (int k = 0; k < Weights.GetLength(1); k++)
-                {
-                    weightSumsByOutputs[i] += Weights[i, k];
-                }
+                _weights[i] = new float[layers[i + 1], layers[i]];
             }
-            return weightSumsByOutputs;
+        }
+
+        private void InitializeBiases(int[] layers)
+        {
+            for (int i = 0; i < _biases.Length; i++)
+            {
+                _biases[i] = new float[layers[i + 2]];
+            }
         }
 
         private float[] ApplyActivationFunction(float[] weightedSums)
-            => weightedSums.Select(x => ActivationFunction.Execute(x)).ToArray();
-
-        private int IncreaseValueIfHasBias(int value)
-        {
-            if (HasBias)
-            {
-                return ++value;
-            }
-            return value;
-        }
+            => weightedSums.Select(x => _activationFunction.Execute(x)).ToArray();
 
         private static float[] ConvertTwoDimensionalArrayToSingleDimensionalArray(float[,] mArray)
         {
@@ -166,11 +198,20 @@ namespace Models.NeuralNetModels
             return sArray;
         }
 
-        private bool IsValidInputs(int inputsLength) => inputsLength == _inputs.Length;
+        private void ThrowExceptionForInvalidLayerDimension(int[] layers)
+        {
+            for (int i = 0; i < layers.Length; i++)
+            {
+                if (!IsValidNodesNumber(layers[i]))
+                {
+                    throw new ArgumentOutOfRangeException(paramName: i.ToString(), message: "Incorrect number of layer items.");
+                }
+            }
+        }
 
-        private static bool IsValidInputsNumber(int inputsNumber) => inputsNumber > 0;
+        private bool IsValidInputs(int inputsLength) => inputsLength == _layers[0].Length;
 
-        private static bool IsValidOutputsNumber(int outputsNumber) => outputsNumber > 0;
+        private static bool IsValidNodesNumber(int nodesNumber) => nodesNumber > 0;
 
     }
 }
